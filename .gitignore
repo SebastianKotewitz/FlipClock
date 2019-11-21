@@ -2,10 +2,7 @@
 *
 
 #expect for flip_clock stuff and gitignore
-!*/
-!flip_clock.dart/
-!leaf_half.dart/
-!main.dart/
-!split_flap_array.dart/
 !.gitignore
 !README.md/
+!lib/
+!lib/*
