@@ -5,21 +5,15 @@ import 'package:flutter_clock_helper/model.dart';
 import 'package:flip_clock/split_flap_array.dart';
 
 enum _Element {
-  background,
   text,
-  shadow,
 }
 
 final _lightTheme = {
-  _Element.background: Color(0xFF81B3FE),
   _Element.text: Colors.white,
-  _Element.shadow: Colors.black,
 };
 
 final _darkTheme = {
-  _Element.background: Colors.black,
   _Element.text: Colors.white,
-  _Element.shadow: Color(0xFF174EA6),
 };
 
 final _weatherEnumList = [
@@ -62,11 +56,12 @@ class _FlipClockState extends State<FlipClock> {
   final GlobalKey<SplitFlapArrayState> secondKey = GlobalKey();
   final GlobalKey<SplitFlapArrayState> ampmKey = GlobalKey();
   final GlobalKey<SplitFlapArrayState> weatherKey = GlobalKey();
+  final GlobalKey<SplitFlapArrayState> temperatureFirstKey = GlobalKey();
+  final GlobalKey<SplitFlapArrayState> temperatureSecondKey = GlobalKey();
   final GlobalKey<SplitFlapArrayState> unitKey = GlobalKey();
 
   DateTime _dateTime = DateTime.now();
   Timer _timer;
-  int _testindex = 0;
 
   @override
   void initState() {
@@ -119,11 +114,14 @@ class _FlipClockState extends State<FlipClock> {
   Widget build(BuildContext context) {
     final _is24Hour = widget.model.is24HourFormat;
     final _weather = widget.model.weatherString;
+    final _temperature = widget.model.temperature.round();
     final _unit = widget.model.unit;
 
     // Flip the flaps
     if (_dateTime.hour > 12 && !_is24Hour) {
       hourKey.currentState?.flipToIndex(_dateTime.hour - 12);
+    } else if (_dateTime.hour == 0 && !_is24Hour) {
+      hourKey.currentState?.flipToIndex(12);
     } else {
       hourKey.currentState?.flipToIndex(_dateTime.hour);
     }
@@ -135,13 +133,15 @@ class _FlipClockState extends State<FlipClock> {
       ampmKey.currentState?.flipToIndex(1);
     }
     weatherKey.currentState?.flipToIndex(_weatherEnumList.indexOf(_weather));
-    // unitKey.currentState?.flipToIndex(_unit == TemperatureUnit.celsius ? 0 : 1);
+    unitKey.currentState?.flipToIndex(_unit == TemperatureUnit.celsius ? 0 : 1);
+    temperatureFirstKey.currentState?.flipToIndex((_temperature / 10).floor());
+    temperatureSecondKey.currentState?.flipToIndex(_temperature % 10);
 
-    final fontSizeLarge = MediaQuery.of(context).size.width / 8;
-    final fontSizeSecond = MediaQuery.of(context).size.width / 16;
+    final fontSizeLarge = MediaQuery.of(context).size.width / 6;
+    final fontSizeSecond = MediaQuery.of(context).size.width / 14;
     final fontSizeMedium = MediaQuery.of(context).size.width / 18;
-    final fontSizeSmall = MediaQuery.of(context).size.width / 25;
-    final fontSizeWeather = MediaQuery.of(context).size.width / 28;
+    final fontSizeWeather = MediaQuery.of(context).size.width / 22;
+    final fontSizeSmall = MediaQuery.of(context).size.width / 24;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -163,12 +163,14 @@ class _FlipClockState extends State<FlipClock> {
             _numberedFlapArray(secondKey, 60, fontSizeSecond, LeafSize.MEDIUM,
                 LeafRatio.SQUARE),
           ]
-              .map((element) => Container(
-                    child: element,
-                    margin: EdgeInsets.symmetric(
-                      horizontal: 8,
-                    ),
-                  ))
+              .map(
+                (element) => Container(
+                  child: element,
+                  margin: EdgeInsets.symmetric(
+                    horizontal: 4,
+                  ),
+                ),
+              )
               .toList(),
         ),
         Row(
@@ -177,10 +179,24 @@ class _FlipClockState extends State<FlipClock> {
           children: <Widget>[
             _textFlapArray(weatherKey, _weatherList, fontSizeWeather,
                 LeafSize.MEDIUM, LeafRatio.WIDE),
-            // _textFlapArray(unitKey, _unitList, fontSizeSecond, LeafSize.MEDIUM,
-            //     LeafRatio.SQUARE),
+            Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: 8,
+              ),
+            ),
+            _numberedFlapArray(temperatureFirstKey, 10, fontSizeMedium,
+                LeafSize.SMALL, LeafRatio.SQUARE),
+            _numberedFlapArray(temperatureSecondKey, 10, fontSizeMedium,
+                LeafSize.SMALL, LeafRatio.SQUARE),
+            Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: 4,
+              ),
+            ),
+            _textFlapArray(unitKey, _unitList, fontSizeSmall, LeafSize.TINY,
+                LeafRatio.SQUARE),
           ],
-        )
+        ),
       ],
     );
   }
@@ -196,7 +212,10 @@ class _FlipClockState extends State<FlipClock> {
               stringList[index],
               style: TextStyle(
                 fontSize: fontSize,
-                fontWeight: FontWeight.w700,
+                fontWeight: Theme.of(context).brightness == Brightness.dark
+                    ? FontWeight.w700
+                    : FontWeight.w300,
+                fontStyle: FontStyle.italic,
               ),
             );
           }),
@@ -208,7 +227,11 @@ class _FlipClockState extends State<FlipClock> {
   Widget _numberedFlapArray(Key key, int length, double fontSize,
       LeafSize leafSize, LeafRatio leafRatio) {
     final List<String> list = List.generate(length, (index) {
-      return '$index'.padLeft(2, '0');
+      if (length > 10) {
+        return '$index'.padLeft(2, '0');
+      } else {
+        return '$index';
+      }
     });
     return _textFlapArray(key, list, fontSize, leafSize, leafRatio);
   }

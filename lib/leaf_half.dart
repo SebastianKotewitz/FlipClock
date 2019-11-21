@@ -11,7 +11,7 @@ final _lightTheme = {
 };
 
 final _darkTheme = {
-  _Flap.background: Color(0xFF444444),
+  _Flap.background: Color(0xFF333333),
   _Flap.border: Colors.black,
 };
 

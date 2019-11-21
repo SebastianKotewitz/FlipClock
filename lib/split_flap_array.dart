@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 enum LeafSize {
+  TINY,
   SMALL,
   MEDIUM,
   LARGE,
@@ -54,13 +55,15 @@ class SplitFlapArrayState extends State<SplitFlapArray> {
     final LeafSize leafSize = widget.size;
     final LeafRatio leafRatio = widget.ratio;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double containerHeight = leafSize == LeafSize.SMALL
-        ? screenWidth / 14.0
-        : leafSize == LeafSize.MEDIUM
-            ? screenWidth / 10.0
-            : leafSize == LeafSize.LARGE
-                ? screenWidth / 6.0
-                : screenWidth / 14.0;
+    final double containerHeight = leafSize == LeafSize.TINY
+        ? screenWidth / 16.0
+        : leafSize == LeafSize.SMALL
+            ? screenWidth / 12.0
+            : leafSize == LeafSize.MEDIUM
+                ? screenWidth / 8.0
+                : leafSize == LeafSize.LARGE
+                    ? screenWidth / 4.0
+                    : screenWidth / 14.0;
     final double containerWidth = leafRatio == LeafRatio.SQUARE
         ? containerHeight
         : leafRatio == LeafRatio.WIDE ? containerHeight * 2.5 : containerHeight;
