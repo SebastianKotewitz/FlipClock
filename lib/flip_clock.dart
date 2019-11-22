@@ -57,6 +57,12 @@ final _months = [
   "Dec",
 ];
 
+final _temperatureThirdDigitList = [
+  " ",
+  "1",
+  "－",
+];
+
 final _unitList = [
   "°C",
   "°F",
@@ -93,7 +99,6 @@ class _FlipClockState extends State<FlipClock> {
   final GlobalKey<SplitFlapArrayState> _weekdayKey = GlobalKey();
   final GlobalKey<SplitFlapArrayState> _dayKey = GlobalKey();
   final GlobalKey<SplitFlapArrayState> _monthKey = GlobalKey();
-  final GlobalKey<SplitFlapArrayState> _temperatureSignKey = GlobalKey();
   final GlobalKey<SplitFlapArrayState> _temperatureFirstKey = GlobalKey();
   final GlobalKey<SplitFlapArrayState> _temperatureSecondKey = GlobalKey();
   final GlobalKey<SplitFlapArrayState> _temperatureThirdKey = GlobalKey();
@@ -162,16 +167,14 @@ class _FlipClockState extends State<FlipClock> {
     int _temperatureDigitThree;
 
     final _absTemp = _temperature.round().abs();
+    final _negDegrees = _temperature < 0;
 
     _temperatureDigitOne = _absTemp % 100 % 10;
     _temperatureDigitTwo = ((_absTemp % 100) / 10).floor();
-    _temperatureDigitThree = (_absTemp >= 100) ? 1 : 0;
+    _temperatureDigitThree = _negDegrees ? 2 : (_absTemp >= 100) ? 1 : 0;
 
     _temperatureDigitTwo = (_absTemp < 10) ? 10 : _temperatureDigitTwo;
-    if (_isCelsius && _absTemp > 99) {
-      _temperatureDigitOne = 9;
-      _temperatureDigitTwo = 9;
-    } else if (_absTemp > 199) {
+    if (_temperature > 199 || _temperature < -99) {
       _temperatureDigitOne = 9;
       _temperatureDigitTwo = 9;
     }
@@ -181,7 +184,6 @@ class _FlipClockState extends State<FlipClock> {
     _flipFlap(_ampmKey, _dateTime.hour);
     _flipFlap(_minuteKey, _dateTime.minute);
     _flipFlap(_secondKey, _dateTime.second);
-    _flipFlap(_temperatureSignKey, (_temperature >= 0) ? 0 : 1);
     _flipFlap(_weekdayKey, _dateTime.weekday - 1);
     _flipFlap(_dayKey, _dateTime.day - 1);
     _flipFlap(_monthKey, _dateTime.month - 1);
@@ -192,9 +194,8 @@ class _FlipClockState extends State<FlipClock> {
     final _screenWidth = MediaQuery.of(context).size.width;
 
     final fontSizeLarge = _screenWidth / 4.5;
-    final fontSizeSecond = _screenWidth / 12;
-    final fontSizeMedium = _screenWidth / 18;
-    final fontSizeSmall = _screenWidth / 24;
+    final fontSizeMedium = _screenWidth / 12;
+    final fontSizeSmall = _screenWidth / 18;
     final _margin = _screenWidth / 173;
 
     return Container(
@@ -207,11 +208,6 @@ class _FlipClockState extends State<FlipClock> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
-              // Visibility(
-              //   child: _textFlapArray(_ampmKey, ["AM", "PM"], fontSizeSmall,
-              //       LeafSize.SMALL, LeafRatio.SQUARE),
-              //   visible: !_is24Hour,
-              // ),
               _is24Hour
                   ? _numberedFlapArray(_hourKey, 24, fontSizeLarge,
                       LeafSize.LARGE, LeafRatio.SQUARE)
@@ -222,7 +218,7 @@ class _FlipClockState extends State<FlipClock> {
                 child: _numberedFlapArray(_minuteKey, 60, fontSizeLarge,
                     LeafSize.LARGE, LeafRatio.SQUARE),
               ),
-              _numberedFlapArray(_secondKey, 60, fontSizeSecond,
+              _numberedFlapArray(_secondKey, 60, fontSizeMedium,
                   LeafSize.MEDIUM, LeafRatio.SQUARE),
             ],
           ),
@@ -234,60 +230,49 @@ class _FlipClockState extends State<FlipClock> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    _textFlapArray(_weekdayKey, _weekdays, fontSizeMedium,
+                    _textFlapArray(_weekdayKey, _weekdays, fontSizeSmall,
                         LeafSize.SMALL, LeafRatio.WIDE,
                         overrideTextStyle: TextStyle(height: 1.1)),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: _margin),
-                      child: _textFlapArray(_dayKey, _days, fontSizeMedium,
+                      child: _textFlapArray(_dayKey, _days, fontSizeSmall,
                           LeafSize.SMALL, LeafRatio.SQUARE),
                     ),
-                    _textFlapArray(_monthKey, _months, fontSizeMedium,
+                    _textFlapArray(_monthKey, _months, fontSizeSmall,
                         LeafSize.SMALL, LeafRatio.WIDE),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
+                    _textFlapArray(
+                        _temperatureThirdKey,
+                        _temperatureThirdDigitList,
+                        fontSizeSmall,
+                        LeafSize.SMALL,
+                        LeafRatio.SQUARE,
+                        overrideTextStyle: TextStyle(
+                          fontStyle: FontStyle.normal,
+                          height: 1.1,
+                        )),
                     Container(
-                      margin: EdgeInsets.only(right: _margin),
-                      child: _textFlapArray(_temperatureSignKey, [" ", "-"],
-                          fontSizeSmall, LeafSize.TINY, LeafRatio.SQUARE),
-                    ),
-                    Visibility(
-                      child: Container(
-                        margin: EdgeInsets.only(right: _margin),
-                        child: _textFlapArray(_temperatureThirdKey, [" ", "1"],
-                            fontSizeMedium, LeafSize.SMALL, LeafRatio.SQUARE),
-                      ),
-                      visible: !_isCelsius,
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(right: _margin),
+                      margin: EdgeInsets.symmetric(horizontal: _margin),
                       child: _textFlapArray(
                           _temperatureSecondKey,
                           _temperatureDigitList,
-                          fontSizeMedium,
+                          fontSizeSmall,
                           LeafSize.SMALL,
                           LeafRatio.SQUARE),
                     ),
-                    Container(
-                      margin: EdgeInsets.only(right: _margin),
-                      child: _textFlapArray(
-                          _temperatureFirstKey,
-                          _temperatureDigitList,
-                          fontSizeMedium,
-                          LeafSize.SMALL,
-                          LeafRatio.SQUARE),
-                    ),
-                    Container(
-                      child: Text(
-                        _unitList[_isCelsius ? 0 : 1],
-                        style: TextStyle(
-                          fontStyle: FontStyle.italic,
-                          fontSize: fontSizeMedium,
-                          fontWeight: _theme[_ClockFace.fontWeight],
-                        ),
+                    _textFlapArray(_temperatureFirstKey, _temperatureDigitList,
+                        fontSizeSmall, LeafSize.SMALL, LeafRatio.SQUARE),
+                    Text(
+                      _unitList[_isCelsius ? 0 : 1],
+                      style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        fontSize: fontSizeSmall,
+                        fontWeight: _theme[_ClockFace.fontWeight],
                       ),
                     ),
                   ],

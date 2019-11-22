@@ -61,8 +61,8 @@ class SplitFlapArrayState extends State<SplitFlapArray> {
     });
   }
 
-  final int tickMilliseconds = 20;
-  final int catchUpMilliseconds = 5;
+  final int tickMilliseconds = 12;
+  final int catchUpMilliseconds = 4;
   final int durationMilliseconds = 250;
 
   @override
@@ -141,22 +141,16 @@ class SplitFlapArrayState extends State<SplitFlapArray> {
               ),
             ),
             Visibility(
-              child: AnimatedPositioned(
-                curve: Curves.linear,
-                duration: Duration(
-                  milliseconds: durationMilliseconds,
-                ),
-                child: Transform(
-                  transform: Matrix4.identity()..rotateX(animationRotation),
-                  origin: Offset(containerWidth / 2, containerHeight / 2),
-                  child: Align(
-                    alignment: animationAlign,
-                    child: _LeafHalf(
-                      animationWidget,
-                      colors,
-                      top: animationTop,
-                      height: leafHeight,
-                    ),
+              child: Transform(
+                transform: Matrix4.identity()..rotateX(animationRotation),
+                origin: Offset(containerWidth / 2, containerHeight / 2),
+                child: Align(
+                  alignment: animationAlign,
+                  child: _LeafHalf(
+                    animationWidget,
+                    colors,
+                    top: animationTop,
+                    height: leafHeight,
                   ),
                 ),
               ),
@@ -191,7 +185,7 @@ class SplitFlapArrayState extends State<SplitFlapArray> {
           : catchUpMilliseconds;
       while (_rotation <= math.pi && mounted) {
         setState(() {
-          _rotation = _rotation + math.pi / 8;
+          _rotation = _rotation + math.pi / 16;
         });
 
         await Future.delayed(Duration(milliseconds: delay));
