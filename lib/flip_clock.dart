@@ -5,14 +5,14 @@ import 'package:flutter_clock_helper/model.dart';
 import 'package:flip_clock/split_flap_array.dart';
 
 final _lightFlapTheme = {
-  Flap.backgroundTop: Color(0xFFF7F7F7),
-  Flap.backgroundBottom: Colors.white,
+  Flap.backgroundTop: Colors.white,
+  Flap.backgroundBottom: Color(0xFFF7F7F7),
   Flap.border: Color(0xFF8B8B8B),
 };
 
 final _darkFlapTheme = {
-  Flap.backgroundTop: Color(0xFF222222),
-  Flap.backgroundBottom: Color(0xFF2D2D2D),
+  Flap.backgroundTop: Color(0xFF2D2D2D),
+  Flap.backgroundBottom: Color(0xFF222222),
   Flap.border: Colors.black,
 };
 
