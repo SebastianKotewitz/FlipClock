@@ -212,7 +212,7 @@ class _FlipClockState extends State<FlipClock> {
                   ? _numberedFlapArray(_hourKey, 24, fontSizeLarge,
                       LeafSize.LARGE, LeafRatio.SQUARE)
                   : _ampmFlapArray(_ampmKey, _ampmDigitList, fontSizeLarge,
-                      LeafSize.LARGE, LeafRatio.SQUARE),
+                      LeafSize.LARGE, LeafRatio.SQUARE, _margin * 3),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: _margin * 2),
                 child: _numberedFlapArray(_minuteKey, 60, fontSizeLarge,
@@ -265,8 +265,15 @@ class _FlipClockState extends State<FlipClock> {
                           LeafSize.SMALL,
                           LeafRatio.SQUARE),
                     ),
-                    _textFlapArray(_temperatureFirstKey, _temperatureDigitList,
-                        fontSizeSmall, LeafSize.SMALL, LeafRatio.SQUARE),
+                    Container(
+                      margin: EdgeInsets.only(right: _margin),
+                      child: _textFlapArray(
+                          _temperatureFirstKey,
+                          _temperatureDigitList,
+                          fontSizeSmall,
+                          LeafSize.SMALL,
+                          LeafRatio.SQUARE),
+                    ),
                     Text(
                       _unitList[_isCelsius ? 0 : 1],
                       style: TextStyle(
@@ -324,7 +331,7 @@ class _FlipClockState extends State<FlipClock> {
   }
 
   Widget _ampmFlapArray(Key key, List<String> list, double fontSize,
-      LeafSize leafSize, LeafRatio leafRatio) {
+      LeafSize leafSize, LeafRatio leafRatio, double margin) {
     return SplitFlapArray(
       key,
       List.generate(list.length, (index) {
@@ -339,8 +346,8 @@ class _FlipClockState extends State<FlipClock> {
             alignment: Alignment.center,
             children: <Widget>[
               Positioned(
-                left: 8,
-                bottom: 8,
+                left: margin,
+                bottom: margin,
                 child: Container(
                   child: Text(ampm,
                       style: TextStyle(
