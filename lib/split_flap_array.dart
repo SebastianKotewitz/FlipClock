@@ -1,4 +1,3 @@
-import 'package:flip_clock/leaf_half.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -14,18 +13,35 @@ enum LeafRatio {
   WIDE,
 }
 
+enum Flap {
+  backgroundTop,
+  backgroundBottom,
+  border,
+}
+
+final _defaultTheme = {
+  Flap.backgroundTop: Colors.white,
+  Flap.backgroundBottom: Colors.white,
+  Flap.border: Colors.black,
+};
+
 class SplitFlapArray extends StatefulWidget {
   const SplitFlapArray(
     this.key,
-    this.list,
+    this.list, {
+    this.colors,
+    this.height,
+    this.width,
     this.size,
     this.ratio,
-  );
+  });
 
   final Key key;
   final List<Widget> list;
   final LeafSize size;
   final LeafRatio ratio;
+  final Map<Flap, Color> colors;
+  final double height, width;
 
   @override
   SplitFlapArrayState createState() => SplitFlapArrayState();
@@ -55,18 +71,29 @@ class SplitFlapArrayState extends State<SplitFlapArray> {
     final LeafSize leafSize = widget.size;
     final LeafRatio leafRatio = widget.ratio;
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double containerHeight = leafSize == LeafSize.TINY
-        ? screenWidth / 16.0
-        : leafSize == LeafSize.SMALL
-            ? screenWidth / 12.0
-            : leafSize == LeafSize.MEDIUM
-                ? screenWidth / 8.0
-                : leafSize == LeafSize.LARGE
-                    ? screenWidth / 4.0
-                    : screenWidth / 14.0;
-    final double containerWidth = leafRatio == LeafRatio.SQUARE
-        ? containerHeight
-        : leafRatio == LeafRatio.WIDE ? containerHeight * 2.5 : containerHeight;
+    double containerHeight, containerWidth;
+    if (widget.height == null) {
+      containerHeight = leafSize == LeafSize.TINY
+          ? screenWidth / 28.0
+          : leafSize == LeafSize.SMALL
+              ? screenWidth / 14.0
+              : leafSize == LeafSize.MEDIUM
+                  ? screenWidth / 6.8
+                  : leafSize == LeafSize.LARGE
+                      ? screenWidth / 3.4
+                      : screenWidth / 14.0;
+    } else {
+      containerHeight = widget.height;
+    }
+    if (widget.width == null) {
+      containerWidth = leafRatio == LeafRatio.SQUARE
+          ? containerHeight
+          : leafRatio == LeafRatio.WIDE
+              ? containerHeight * 1.8
+              : containerHeight;
+    } else {
+      containerWidth = widget.width;
+    }
     final double leafHeight = containerHeight / 2.0;
 
     //Animation parameters to allow for only one necessary widget controlling the animation
@@ -80,6 +107,7 @@ class SplitFlapArrayState extends State<SplitFlapArray> {
     final bool animationTop = rotationFirstHalf;
     final double animationRotation =
         rotationFirstHalf ? _rotation : _rotation + math.pi;
+    final colors = widget.colors ?? _defaultTheme;
 
     return Align(
       alignment: Alignment.center,
@@ -94,18 +122,20 @@ class SplitFlapArrayState extends State<SplitFlapArray> {
           children: <Widget>[
             Align(
               alignment: Alignment.topCenter,
-              child: LeafHalf(
+              child: _LeafHalf(
                 widget.list[_currentIndex],
+                colors,
                 top: true,
                 height: leafHeight,
               ),
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: LeafHalf(
+              child: _LeafHalf(
                 _rotation == 0
                     ? widget.list[_currentIndex]
                     : widget.list[prevIndex],
+                colors,
                 top: false,
                 height: leafHeight,
               ),
@@ -121,8 +151,9 @@ class SplitFlapArrayState extends State<SplitFlapArray> {
                   origin: Offset(containerWidth / 2, containerHeight / 2),
                   child: Align(
                     alignment: animationAlign,
-                    child: LeafHalf(
+                    child: _LeafHalf(
                       animationWidget,
+                      colors,
                       top: animationTop,
                       height: leafHeight,
                     ),
@@ -173,5 +204,47 @@ class SplitFlapArrayState extends State<SplitFlapArray> {
         flipToIndex(index);
       }
     }
+  }
+}
+
+class _LeafHalf extends StatelessWidget {
+  const _LeafHalf(
+    this.widget,
+    this.colors, {
+    this.top = true,
+    this.height = 0.0,
+  });
+
+  final Widget widget;
+  final bool top;
+  final double height;
+  final Map<Flap, Color> colors;
+
+  @override
+  Widget build(BuildContext context) {
+    final borderWidth = 1.0;
+    final borderRadius = 4.0;
+    return Container(
+      decoration: BoxDecoration(
+        color: top ? colors[Flap.backgroundTop] : colors[Flap.backgroundBottom],
+        border: Border.all(
+          color: colors[Flap.border],
+          width: borderWidth,
+        ),
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+      // height: height,
+      child: ClipRect(
+        child: Align(
+          heightFactor: 0.5,
+          alignment: top ? Alignment.topCenter : Alignment.bottomCenter,
+          child: Container(
+            child: Center(
+              child: widget,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
