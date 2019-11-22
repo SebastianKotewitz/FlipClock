@@ -217,7 +217,8 @@ class _LeafHalf extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderWidth = 1.0;
-    final borderRadius = 4.0;
+    final radius = MediaQuery.of(context).size.width / 58;
+    final borderRadius = Radius.circular(radius);
     return Container(
       decoration: BoxDecoration(
         color: top ? colors[Flap.backgroundTop] : colors[Flap.backgroundBottom],
@@ -225,7 +226,15 @@ class _LeafHalf extends StatelessWidget {
           color: colors[Flap.border],
           width: borderWidth,
         ),
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: top
+            ? BorderRadius.only(
+                topLeft: borderRadius,
+                topRight: borderRadius,
+              )
+            : BorderRadius.only(
+                bottomLeft: borderRadius,
+                bottomRight: borderRadius,
+              ),
       ),
       // height: height,
       child: ClipRect(
