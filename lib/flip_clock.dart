@@ -254,7 +254,9 @@ class _FlipClockState extends State<FlipClock> {
                       LeafRatio.SQUARE,
                       overrideTextStyle: TextStyle(
                         height: 1.1,
+                        fontStyle: FontStyle.normal,
                       ),
+                      overrideIndicesOnly: [2],
                     ),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: _margin),
@@ -298,7 +300,7 @@ class _FlipClockState extends State<FlipClock> {
 
   Widget _textFlapArray(Key key, List<String> stringList, double fontSize,
       LeafSize leafSize, LeafRatio leafRatio,
-      {TextStyle overrideTextStyle}) {
+      {TextStyle overrideTextStyle, List<int> overrideIndicesOnly}) {
     return SplitFlapArray(
       key,
       List.generate(
@@ -311,7 +313,10 @@ class _FlipClockState extends State<FlipClock> {
                 ? _lightTheme[_ClockFace.fontWeight]
                 : _darkTheme[_ClockFace.fontWeight],
             fontStyle: FontStyle.italic,
-          ).merge(overrideTextStyle),
+          ).merge(
+              overrideIndicesOnly == null || overrideIndicesOnly.contains(index)
+                  ? overrideTextStyle
+                  : null),
         ),
       ),
       size: leafSize,
