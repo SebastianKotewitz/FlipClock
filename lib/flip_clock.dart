@@ -247,15 +247,15 @@ class _FlipClockState extends State<FlipClock> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     _textFlapArray(
-                        _temperatureThirdKey,
-                        _temperatureThirdDigitList,
-                        fontSizeSmall,
-                        LeafSize.SMALL,
-                        LeafRatio.SQUARE,
-                        overrideTextStyle: TextStyle(
-                          fontStyle: FontStyle.normal,
-                          height: 1.1,
-                        )),
+                      _temperatureThirdKey,
+                      _temperatureThirdDigitList,
+                      fontSizeSmall,
+                      LeafSize.SMALL,
+                      LeafRatio.SQUARE,
+                      overrideTextStyle: TextStyle(
+                        height: 1.1,
+                      ),
+                    ),
                     Container(
                       margin: EdgeInsets.symmetric(horizontal: _margin),
                       child: _textFlapArray(
